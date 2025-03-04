@@ -1,74 +1,31 @@
 #include <iostream>
-#include <climits>
+#define N 4
 using namespace std;
 
-// Function to find the minimum cost path
-void findMinRoute(int tsp[][4], int n) {
-    int sum = 0;
-    int counter = 0;
-    int j = 0, i = 0;
-    int min = INT_MAX;
+void tspGreedy(int g[N][N], int start) {
+    bool v[N] = {false};
+    int cost = 0, city = start;
 
-    // Array to track visited cities
-    int visitedRouteList[4] = {0};
-    visitedRouteList[0] = 1;
+    cout << "Path: " << city << " ";
+    v[city] = true;
 
-    // Array to store the route
-    int route[4];
+    for (int i = 1; i < N; i++) {
+        int next = -1, minDist = 1e9;
+        for (int j = 0; j < N; j++)
+            if (!v[j] && g[city][j] < minDist && g[city][j] > 0)
+                minDist = g[city][j], next = j;
 
-    // Traverse the adjacency matrix tsp[][]
-    while (i < n && j < n) {
-        // If all cities have been visited, stop
-        if (counter >= n - 1) {
-            break;
-        }
-
-        // If the path is unvisited and the cost is less, update the cost
-        if (j != i && visitedRouteList[j] == 0) {
-            if (tsp[i][j] < min) {
-                min = tsp[i][j];
-                route[counter] = j + 1;
-            }
-        }
-        j++;
-
-        // Check all paths from the ith indexed city
-        if (j == n) {
-            sum += min;
-            min = INT_MAX;
-            visitedRouteList[route[counter] - 1] = 1;
-            j = 0;
-            i = route[counter] - 1;
-            counter++;
-        }
+        v[next] = true;
+        cost += minDist;
+        city = next;
+        cout << city << " ";
     }
 
-    // Update the ending city in the array from the city which was last visited
-    i = route[counter - 1] - 1;
-
-    for (j = 0; j < n; j++) {
-        if (i != j && tsp[i][j] < min) {
-            min = tsp[i][j];
-            route[counter] = j + 1;
-        }
-    }
-    sum += min;
-
-    // Print the minimum cost
-    cout << "Minimum Cost is: " << sum << endl;
+    cost += g[city][start];
+    cout << start << "\nCost: " << cost << endl;
 }
 
-// Driver Code
 int main() {
-    // Input Matrix
-    int tsp[4][4] = { { -1, 10, 15, 20 },
-                      { 10, -1, 35, 25 },
-                      { 15, 35, -1, 30 },
-                      { 20, 25, 30, -1 } };
-    int n = 4;
-
-    // Function Call
-    findMinRoute(tsp, n);
-
-    return 0;
+    int g[N][N] = {{0, 10, 15, 20}, {10, 0, 35, 25}, {15, 35, 0, 30}, {20, 25, 30, 0}};
+    tspGreedy(g, 0);
 }
